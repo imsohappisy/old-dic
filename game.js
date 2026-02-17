@@ -274,8 +274,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleUserSubmit() {
-        if (gameMode === 'pvc' && turn !== 'player1') return; // It's computer's turn
         if (turn === 'finished') return;
+
+        // PVC Guard
+        if (gameMode === 'pvc' && turn !== 'player1') return;
+
+        // Online Guard
+        if (gameMode === 'online') {
+            const myTurnSymbol = isHost ? 'player1' : 'player2';
+            if (turn !== myTurnSymbol) return;
+        }
 
         const inputWord = display.input.value.trim();
         const validation = checkValid(currentWord, inputWord);
@@ -407,6 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (turn === 'player1') {
                 display.turnIndicator.textContent = "당신의 차례입니다";
                 display.turnIndicator.style.color = "var(--primary-color)";
+                display.input.disabled = false;
+                buttons.submit.disabled = false;
                 display.input.focus();
             } else {
                 display.turnIndicator.textContent = "컴퓨터가 생각 중...";
@@ -414,8 +424,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 display.input.disabled = true;
                 buttons.submit.disabled = true;
             }
+        } else if (gameMode === 'online') {
+            const myTurnSymbol = isHost ? 'player1' : 'player2';
+            if (turn === myTurnSymbol) {
+                display.turnIndicator.textContent = "당신의 차례입니다";
+                display.turnIndicator.style.color = "var(--primary-color)";
+                display.input.disabled = false;
+                buttons.submit.disabled = false;
+                display.input.focus();
+            } else {
+                display.turnIndicator.textContent = "상대방의 차례입니다";
+                display.turnIndicator.style.color = "var(--accent-color)";
+                display.input.disabled = true;
+                buttons.submit.disabled = true;
+            }
         } else {
             // PvP
+            display.input.disabled = false;
+            buttons.submit.disabled = false;
             if (turn === 'player1') {
                 display.turnIndicator.textContent = "플레이어 1 차례";
                 display.turnIndicator.style.color = "var(--primary-color)";
