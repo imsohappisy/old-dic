@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>끝말잇기 게임</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Main Menu Screen -->
+        <div id="main-menu" class="screen active">
+            <header class="menu-header">
+                <h1>한국어 끝말잇기</h1>
+                <p class="subtitle">두음법칙 적용 | 단어 대결</p>
+            </header>
+
+            <div class="menu-options">
+                <button id="btn-pvc" class="menu-btn primary">
+                    <span class="icon">🤖</span>
+                    <span class="text">컴퓨터와 대결</span>
+                </button>
+                <button id="btn-pvp" class="menu-btn secondary">
+                    <span class="icon">👥</span>
+                    <span class="text">사람과 대결</span>
+                </button>
+                <button id="btn-online" class="menu-btn online">
+                    <span class="icon">🌐</span>
+                    <span class="text">온라인 대결 (β)</span>
+                </button>
+                <a href="#" class="menu-btn coffee" target="_blank" id="btn-coffee">
+                    <span class="icon">☕</span>
+                    <span class="text">개발자에게 커피 사주기</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <header class="game-header">
+                <button id="btn-home" class="icon-btn" aria-label="메인으로">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                </button>
+                <div class="score-display">
+                    <span class="label">점수</span>
+                    <span id="score" class="value">0</span>
+                </div>
+            </header>
+
+            <main class="game-area">
+                <div class="turn-indicator" id="turn-indicator">게임 준비 중...</div>
+
+                <!-- Gibo Style History (Horizontal Flow) -->
+                <div class="word-history-container">
+                    <div id="word-history" class="word-flow">
+                        <!-- Words will be added here as chips -->
+                        <div class="word-chip start-marker">시작</div>
+                    </div>
+                </div>
+
+                <!-- Next Syllable Display -->
+                <div class="next-target-display">
+                    <span class="label">이을 음절</span>
+                    <div id="next-syllables" class="syllable-list">
+                        <span class="syllable empty">-</span>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <input type="text" id="user-input" placeholder="단어를 입력하세요..." autocomplete="off">
+                    <button id="give-up-btn" aria-label="기권" class="hidden">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                            <line x1="4" y1="22" x2="4" y2="15" />
+                        </svg>
+                    </button>
+                    <button id="submit-btn" aria-label="입력">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="error-message" class="error-message"></div>
+            </main>
+        </div>
+        <!-- Online Lobby Screen -->
+        <div id="lobby-screen" class="screen hidden">
+            <header class="menu-header">
+                <button id="btn-back-main" class="icon-btn" style="position: absolute; top: 20px; left: 20px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 style="font-size: 1.8rem; margin-top: 10px;">온라인 대결 (β)</h1>
+                <p class="subtitle">친구와 실시간으로 대결하세요</p>
+            </header>
+
+            <div class="lobby-content">
+                <div class="lobby-section">
+                    <h3>방 만들기</h3>
+                    <p class="desc">방을 만들어 친구를 초대하세요.</p>
+                    <div class="room-display hidden" id="room-id-display">
+                        <span class="label">내 방 ID:</span>
+                        <span class="code" id="my-peer-id"> </span>
+                        <button class="copy-btn" id="btn-copy-id">복사</button>
+                    </div>
+                    <button id="btn-create-room" class="menu-btn primary small">
+                        방 생성하기
+                    </button>
+                    <div id="connection-status" class="status-msg"></div>
+                </div>
+
+                <div class="divider">
+                    <span>또는</span>
+                </div>
+
+                <div class="lobby-section">
+                    <h3>방 참가하기</h3>
+                    <p class="desc">친구의 방 ID를 입력하세요.</p>
+                    <div class="input-group">
+                        <input type="text" id="target-peer-id" placeholder="상대방 ID 입력" autocomplete="off">
+                        <button id="btn-join-room" class="menu-btn secondary small">참가</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Version Badge -->
+            <div class="version-badge">v1.0.7</div>
+        </div>
+
+        <!-- Background Decoration -->
+        <div class="bg-decoration">
+            <svg class="blob blob-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FF0066"
+                    d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.6,-46.6C91.4,-34.1,98.1,-19.2,95.8,-4.9C93.5,9.3,82.2,22.9,71.1,34.3C60,45.7,49.1,54.9,37.6,62.1C26.1,69.4,14,74.7,1.2,72.7C-11.7,70.6,-25.2,61.3,-37.8,53.2C-50.4,45.2,-62,38.5,-70.6,28.6C-79.1,18.7,-84.6,5.6,-83.4,-7.1C-82.2,-19.8,-74.3,-32.1,-64.1,-41.7C-53.9,-51.3,-41.4,-58.2,-29.2,-66.9C-16.9,-75.6,-4.9,-86,5.5,-95.5L15.9,-105"
+                    transform="translate(100 100)" />
+            </svg>
+            <svg class="blob blob-2" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#00CCFF"
+                    d="M38.1,-63.3C49.9,-54.9,60.5,-46.5,69.5,-36.1C78.5,-25.7,85.9,-13.4,85.1,-1.3C84.3,10.8,75.3,22.7,65.6,33.4C55.9,44.1,45.4,53.6,33.9,61.1C22.4,68.6,9.8,74.1,-1.9,77.4C-13.6,80.7,-24.4,81.8,-34.7,76.6C-45,71.4,-54.8,59.9,-62.7,47.3C-70.6,34.7,-76.6,21,-77.3,7.2C-78,-6.6,-73.4,-20.5,-65.4,-32.4C-57.4,-44.3,-46,-54.2,-33.8,-62.4C-21.6,-70.6,-8.6,-77.1,2.6,-81.6L13.8,-86.1"
+                    transform="translate(100 100)" />
+            </svg>
+        </div>
+
+        <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+        <script src="wordlist.js"></script>
+        <script src="game.js"></script>
+</body>
+
+</html>
