@@ -480,6 +480,16 @@ button#give-up-btn.hidden {
     }
 }
 
+@media (max-width: 380px) {
+    .input-group {
+        flex-direction: column;
+    }
+
+    .input-group .menu-btn {
+        width: 100%;
+    }
+}
+
 /* Lobby Screen */
 .lobby-content {
     flex: 1;
@@ -553,6 +563,13 @@ button#give-up-btn.hidden {
 .input-group {
     display: flex;
     gap: 8px;
+    width: 100%;
+}
+
+.input-group .menu-btn {
+    width: auto;
+    padding: 0 16px;
+    white-space: nowrap;
 }
 
 .menu-btn.small {
