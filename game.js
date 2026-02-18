@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.createRoom.disabled = false;
         buttons.joinRoom.disabled = false;
         buttons.copyId.disabled = true;
+        display.online.status.style.color = 'var(--text-muted)';
     }
 
     function showSupportScreen() {
@@ -155,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
         usedWords.clear();
         currentWord = '';
         score = 0;
-        turn = 'player1'; // Global turn always starts with Player 1 (Host in Online, User in PvC)
+        turn = 'player1';
+        display.online.status.style.color = 'var(--text-muted)';
 
         // Clear History
         display.history.innerHTML = '<div class="word-chip start-marker">시작</div>';
@@ -489,9 +491,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         peer.on('error', (err) => {
-            console.error(err);
-            let msg = '오류 발생: ' + err.type;
+            console.error('Peer Error:', err.type);
+            let msg = '오류가 발생했습니다.';
             if (err.type === 'unavailable-id') msg = 'ID를 사용할 수 없습니다. 다시 시도해주세요.';
+            else msg = `네트워크 오류: ${err.type}`;
+
             display.online.status.textContent = msg;
             display.online.status.style.color = 'var(--accent-color)';
             buttons.createRoom.disabled = false;
@@ -505,8 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (targetId === myId) {
+        if (targetId === myId && myId !== '') {
             alert('본인이 만든 방에는 참여할 수 없습니다.');
+            display.online.status.textContent = '';
             return;
         }
 
@@ -523,10 +528,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         peer.on('error', (err) => {
-            console.error(err);
-            let msg = '오류 발생: ' + err.type;
+            console.error('Peer Error (Guest):', err.type);
+            let msg = '';
             if (err.type === 'peer-unavailable') msg = '존재하지 않는 방 ID입니다.';
-            if (err.type === 'invalid-id') msg = '방 ID 형식이 잘못되었습니다.';
+            else if (err.type === 'invalid-id') msg = '방 ID 형식이 잘못되었습니다.';
+            else msg = `연결 오류: ${err.type}`;
 
             display.online.status.textContent = msg;
             display.online.status.style.color = 'var(--accent-color)';
