@@ -137,17 +137,30 @@
             <div class="version-badge">v1.0.13</div>
         </div>
 
-        <!-- Coffee Support Modal -->
-        <div id="coffee-modal" class="modal hidden">
-            <div class="modal-backdrop"></div>
-            <div class="modal-content">
-                <button class="modal-close" id="btn-close-modal">&times;</button>
-                <h3>개발자에게 커피 사주기</h3>
-                <p>QR 코드를 스캔하여 따뜻한 응원을 보내주세요!</p>
-                <div class="qr-container">
-                    <img src="qr.png" alt="Coffee QR Code">
+        <!-- Support Screen (Premium UI) -->
+        <div id="support-screen" class="screen hidden">
+            <div class="support-container">
+                <div class="support-card">
+                    <div class="support-header">
+                        <span class="support-badge">Support Creator</span>
+                        <h2>개발자를 응원해주세요 ☕️</h2>
+                        <p>보내주시는 따뜻한 응원은 더 좋은 게임을 <br>지속해서 만드는 데 큰 힘이 됩니다.</p>
+                    </div>
+
+                    <div class="support-qr-section">
+                        <div class="qr-glow-wrapper">
+                            <div class="qr-box">
+                                <img src="qr.png" alt="Coffee QR Code">
+                            </div>
+                        </div>
+                        <p class="qr-hint">QR 코드를 스캔하여 마음을 전해주세요</p>
+                    </div>
+
+                    <div class="support-footer">
+                        <p class="thanks-msg">언제나 감사합니다!</p>
+                        <button class="menu-btn secondary" id="btn-support-back">메인으로 돌아가기</button>
+                    </div>
                 </div>
-                <button class="menu-btn secondary small" id="btn-modal-close-confirm">닫기</button>
             </div>
         </div>
 

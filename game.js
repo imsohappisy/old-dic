@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menu: document.getElementById('main-menu'),
         lobby: document.getElementById('lobby-screen'),
         game: document.getElementById('game-screen'),
-        coffee: document.getElementById('coffee-modal')
+        support: document.getElementById('support-screen')
     };
 
     const buttons = {
@@ -33,8 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         copyId: document.getElementById('btn-copy-id'),
         backMain: document.getElementById('btn-back-main'),
         coffee: document.getElementById('btn-coffee'),
-        closeModal: document.getElementById('btn-close-modal'),
-        closeModalConfirm: document.getElementById('btn-modal-close-confirm')
+        supportBack: document.getElementById('btn-support-back')
     };
 
     const display = {
@@ -78,14 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.copyId.addEventListener('click', copyRoomId);
         buttons.backMain.addEventListener('click', showMenu);
 
-        // Coffee Modal Listeners
+        // Support Screen Listeners
         buttons.coffee.addEventListener('click', (e) => {
             e.preventDefault();
-            showCoffeeModal();
+            showSupportScreen();
         });
-        buttons.closeModal.addEventListener('click', hideCoffeeModal);
-        buttons.closeModalConfirm.addEventListener('click', hideCoffeeModal);
-        screens.coffee.querySelector('.modal-backdrop').addEventListener('click', hideCoffeeModal);
+        buttons.supportBack.addEventListener('click', showMenu);
 
         display.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleUserSubmit();
@@ -106,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
         screens.game.classList.add('hidden');
         screens.lobby.classList.remove('active');
         screens.lobby.classList.add('hidden');
+        screens.support.classList.remove('active');
+        screens.support.classList.add('hidden');
     }
 
     function showLobby() {
@@ -122,12 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.joinRoom.disabled = false;
     }
 
-    function showCoffeeModal() {
-        screens.coffee.classList.remove('hidden');
-    }
-
-    function hideCoffeeModal() {
-        screens.coffee.classList.add('hidden');
+    function showSupportScreen() {
+        screens.menu.classList.remove('active');
+        screens.menu.classList.add('hidden');
+        screens.support.classList.remove('hidden');
+        screens.support.classList.add('active');
     }
 
     function startGame(mode) {
