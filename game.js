@@ -154,11 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         usedWords.clear();
         currentWord = '';
         score = 0;
-        turn = 'player1'; // In PvP, Player 1 starts. In PvC, User starts.
-
-        if (gameMode === 'online') {
-            turn = isHost ? 'player1' : 'player2'; // Host is always Player 1
-        }
+        turn = 'player1'; // Global turn always starts with Player 1 (Host in Online, User in PvC)
 
         // Clear History
         display.history.innerHTML = '<div class="word-chip start-marker">시작</div>';
