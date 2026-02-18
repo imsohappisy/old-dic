@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         display.online.roomDisplay.classList.add('hidden');
         buttons.createRoom.disabled = false;
         buttons.joinRoom.disabled = false;
+        buttons.copyId.disabled = true;
     }
 
     function showSupportScreen() {
@@ -479,6 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
             display.online.myId.textContent = id;
             display.online.roomDisplay.classList.remove('hidden');
             display.online.status.textContent = '상대방을 기다리는 중...';
+            buttons.copyId.disabled = false;
         });
 
         peer.on('connection', (c) => {
@@ -488,7 +490,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         peer.on('error', (err) => {
             console.error(err);
-            display.online.status.textContent = '오류 발생: ' + err.type;
+            let msg = '오류 발생: ' + err.type;
+            if (err.type === 'unavailable-id') msg = 'ID를 사용할 수 없습니다. 다시 시도해주세요.';
+            display.online.status.textContent = msg;
+            display.online.status.style.color = 'var(--accent-color)';
             buttons.createRoom.disabled = false;
         });
     }
@@ -497,6 +502,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetId = display.online.targetId.value.trim();
         if (!targetId) {
             alert('상대방 ID를 입력해주세요.');
+            return;
+        }
+
+        if (targetId === myId) {
+            alert('본인이 만든 방에는 참여할 수 없습니다.');
             return;
         }
 
@@ -514,8 +524,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         peer.on('error', (err) => {
             console.error(err);
-            display.online.status.textContent = '오류 발생: ' + err.type;
+            let msg = '오류 발생: ' + err.type;
+            if (err.type === 'peer-unavailable') msg = '존재하지 않는 방 ID입니다.';
+            if (err.type === 'invalid-id') msg = '방 ID 형식이 잘못되었습니다.';
+
+            display.online.status.textContent = msg;
+            display.online.status.style.color = 'var(--accent-color)';
             buttons.joinRoom.disabled = false;
+
+            if (peer) {
+                peer.destroy();
+                peer = null;
+            }
         });
     }
 
