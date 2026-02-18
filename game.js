@@ -251,19 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        turn = 'finished';
-        let winner = '';
-        if (turn === 'player1') {
-            winner = '플레이어 2';
-        } else {
-            winner = '플레이어 1';
-        }
-
-        display.turnIndicator.textContent = `${winner} 승리! (상대방 기권)`;
-        display.turnIndicator.style.color = "var(--primary-color)";
-        display.input.disabled = true;
-        buttons.submit.disabled = true;
-        buttons.giveUp.disabled = true;
+        // For local PvP/PvC
+        const loser = turn; // The one who clicked give up
+        processGiveUp(loser === 'player1' ? 'me' : 'opponent');
     }
 
     function processGiveUp(who) {
@@ -384,18 +374,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const chip = document.createElement('div');
 
         let className = 'word-chip ';
-        if (player === 'player1') className += 'user-word';
-        else if (player === 'computer') className += 'computer-word';
-        else className += 'opponent-word'; // player2 in PvP
+
+        // Correct coloring for Online vs PvP/PvC
+        if (gameMode === 'online') {
+            const me = isHost ? 'player1' : 'player2';
+            if (player === me) className += 'user-word';
+            else className += 'opponent-word';
+        } else {
+            if (player === 'player1') className += 'user-word';
+            else if (player === 'computer') className += 'computer-word';
+            else className += 'opponent-word'; // player2 in PvP
+        }
 
         chip.className = className;
         chip.textContent = word;
 
         display.history.appendChild(chip);
 
-        // Scroll to bottom
-        // display.history.parentElement.scrollTop = display.history.parentElement.scrollHeight;
-        // Actually, flex-wrap flow, auto scroll container
         const container = display.history.parentElement;
         container.scrollTop = container.scrollHeight;
     }
@@ -527,13 +522,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupConnection() {
         conn.on('open', () => {
             display.online.status.textContent = '연결되었습니다! 게임을 시작합니다.';
-            setTimeout(() => {
+            if (isHost) {
                 startGame('online');
-            }, 1000);
+                conn.send({ type: 'start' });
+            }
         });
 
         conn.on('data', (data) => {
-            if (data.type === 'move') {
+            if (data.type === 'start') {
+                startGame('online');
+            } else if (data.type === 'move') {
                 processTurn(data.word);
             } else if (data.type === 'giveup') {
                 processGiveUp('opponent');
