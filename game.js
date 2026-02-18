@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
         menu: document.getElementById('main-menu'),
         lobby: document.getElementById('lobby-screen'),
         game: document.getElementById('game-screen'),
-        support: document.getElementById('support-screen')
+        support: document.getElementById('support-screen'),
+        alert: document.getElementById('alert-modal')
     };
 
     const buttons = {
@@ -33,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         copyId: document.getElementById('btn-copy-id'),
         backMain: document.getElementById('btn-back-main'),
         coffee: document.getElementById('btn-coffee'),
-        supportBack: document.getElementById('btn-support-back')
+        supportBack: document.getElementById('btn-support-back'),
+        alertClose: document.getElementById('btn-alert-close')
     };
 
     const display = {
@@ -48,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
             targetId: document.getElementById('target-peer-id'),
             status: document.getElementById('connection-status'),
             roomDisplay: document.getElementById('room-id-display')
-        }
+        },
+        alertMessage: document.getElementById('alert-message')
     };
 
     // --- Initialization ---
@@ -76,6 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.joinRoom.addEventListener('click', initGuest);
         buttons.copyId.addEventListener('click', copyRoomId);
         buttons.backMain.addEventListener('click', showMenu);
+        buttons.alertClose.addEventListener('click', () => {
+            screens.alert.classList.add('hidden');
+        });
 
         // Support Screen Listeners
         buttons.coffee.addEventListener('click', (e) => {
@@ -140,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         screens.game.classList.add('active');
         screens.lobby.classList.remove('active');
         screens.lobby.classList.add('hidden');
+        screens.alert.classList.add('hidden');
 
         // Toggle Give Up Button
         if (gameMode === 'pvp' || gameMode === 'online') {
@@ -505,12 +512,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function initGuest() {
         const targetId = display.online.targetId.value.trim();
         if (!targetId) {
-            alert('상대방 ID를 입력해주세요.');
+            showCustomAlert('상대방 ID를 입력해주세요.');
             return;
         }
 
         if (targetId === myId && myId !== '') {
-            alert('본인이 만든 방에는 참여할 수 없습니다.');
+            showCustomAlert('본인이 만든 방에는 참여할 수 없습니다.');
             display.online.status.textContent = '';
             return;
         }
@@ -532,6 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let msg = '';
             if (err.type === 'peer-unavailable') msg = '존재하지 않는 방 ID입니다.';
             else if (err.type === 'invalid-id') msg = '방 ID 형식이 잘못되었습니다.';
+            else if (err.type === 'network') msg = '네트워크 연결이 불안정합니다.';
             else msg = `연결 오류: ${err.type}`;
 
             display.online.status.textContent = msg;
@@ -565,18 +573,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         conn.on('close', () => {
-            alert('상대방과의 연결이 끊어졌습니다.');
+            showCustomAlert('상대방과의 연결이 끊어졌습니다.');
             showMenu();
         });
     }
 
     function copyRoomId() {
-        const id = display.online.myId.textContent;
+        const id = display.online.myId.textContent.trim();
+        if (!id) return;
+
         navigator.clipboard.writeText(id).then(() => {
             const originalText = buttons.copyId.textContent;
             buttons.copyId.textContent = '복사됨!';
-            setTimeout(() => buttons.copyId.textContent = originalText, 1500);
+            buttons.copyId.classList.add('success');
+            setTimeout(() => {
+                buttons.copyId.textContent = originalText;
+                buttons.copyId.classList.remove('success');
+            }, 1500);
         });
+    }
+
+    function showCustomAlert(msg) {
+        display.alertMessage.textContent = msg;
+        screens.alert.classList.remove('hidden');
     }
 
     function showError(msg) {
