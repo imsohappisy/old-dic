@@ -588,9 +588,29 @@ button#give-up-btn.hidden {
 .divider::before,
 .divider::after {
     content: '';
-    flex: 1;
-    height: 1px;
+    font-size: 0.8rem;
+}
+
+.meta-tag {
+    padding: 2px 8px;
+    border-radius: 6px;
     background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+}
+
+.meta-tag.start {
+    color: var(--primary-color);
+}
+
+.meta-tag.end {
+    color: var(--accent-color);
+}
+
+.search-loader {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
 }
 
 .status-msg {

@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
         lobby: document.getElementById('lobby-screen'),
         game: document.getElementById('game-screen'),
         support: document.getElementById('support-screen'),
-        alert: document.getElementById('alert-modal')
+        alert: document.getElementById('alert-modal'),
+        search: document.getElementById('search-screen')
     };
 
     const buttons = {
@@ -35,7 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
         backMain: document.getElementById('btn-back-main'),
         coffee: document.getElementById('btn-coffee'),
         supportBack: document.getElementById('btn-support-back'),
-        alertClose: document.getElementById('btn-alert-close')
+        alertClose: document.getElementById('btn-alert-close'),
+        search: document.getElementById('btn-search'),
+        searchBack: document.getElementById('btn-search-back'),
+        searchClear: document.getElementById('btn-search-clear')
     };
 
     const display = {
@@ -51,7 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
             status: document.getElementById('connection-status'),
             roomDisplay: document.getElementById('room-id-display')
         },
-        alertMessage: document.getElementById('alert-message')
+        alertMessage: document.getElementById('alert-message'),
+        search: {
+            input: document.getElementById('dictionary-input'),
+            results: document.getElementById('search-results'),
+            info: document.getElementById('search-info'),
+            loader: document.getElementById('search-loader'),
+            container: document.querySelector('.search-results-container')
+        }
     };
 
     // --- Initialization ---
@@ -90,6 +101,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         buttons.supportBack.addEventListener('click', showMenu);
 
+        // Search Screen Listeners
+        buttons.search.addEventListener('click', showSearchScreen);
+        buttons.searchBack.addEventListener('click', showMenu);
+        buttons.searchClear.addEventListener('click', () => {
+            display.online.search.input.value = '';
+            performSearch();
+        });
+
+        let searchTimeout;
+        display.online.search.input.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 300);
+        });
+
+        display.online.search.container.addEventListener('scroll', () => {
+            const { scrollTop, scrollHeight, clientHeight } = display.online.search.container;
+            if (scrollTop + clientHeight >= scrollHeight - 20) {
+                loadMoreResults();
+            }
+        });
+
         display.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleUserSubmit();
         });
@@ -109,8 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
         screens.game.classList.add('hidden');
         screens.lobby.classList.remove('active');
         screens.lobby.classList.add('hidden');
+        screens.lobby.classList.add('hidden');
         screens.support.classList.remove('active');
         screens.support.classList.add('hidden');
+        screens.search.classList.remove('active');
+        screens.search.classList.add('hidden');
     }
 
     function showLobby() {
@@ -134,6 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
         screens.menu.classList.add('hidden');
         screens.support.classList.remove('hidden');
         screens.support.classList.add('active');
+    }
+
+    function showSearchScreen() {
+        screens.menu.classList.remove('active');
+        screens.menu.classList.add('hidden');
+        screens.search.classList.remove('hidden');
+        screens.search.classList.add('active');
+        display.online.search.input.focus();
+        performSearch(); // Initial state
     }
 
     function startGame(mode) {
@@ -607,5 +651,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function clearError() {
         display.error.textContent = '';
+    }
+
+    // --- Search Logic ---
+    let currentSearchResults = [];
+    let displayedCount = 0;
+    const PAGE_SIZE = 50;
+
+    function performSearch() {
+        const query = display.online.search.input.value.trim();
+        display.online.search.results.innerHTML = '';
+        displayedCount = 0;
+
+        if (query.length === 0) {
+            display.online.search.info.textContent = '단어를 입력하면 실시간으로 검색됩니다.';
+            currentSearchResults = [];
+            return;
+        }
+
+        display.online.search.loader.classList.remove('hidden');
+
+        // Use setTimeout to avoid UI freeze during filter
+        setTimeout(() => {
+            currentSearchResults = wordList.filter(word => word.includes(query));
+            display.online.search.info.textContent = `검색 결과: ${currentSearchResults.length.toLocaleString()}개`;
+            display.online.search.loader.classList.add('hidden');
+            loadMoreResults();
+        }, 10);
+    }
+
+    function loadMoreResults() {
+        if (displayedCount >= currentSearchResults.length) return;
+
+        const nextBatch = currentSearchResults.slice(displayedCount, displayedCount + PAGE_SIZE);
+        const fragment = document.createDocumentFragment();
+
+        nextBatch.forEach(word => {
+            const card = document.createElement('div');
+            card.className = 'word-card';
+
+            const startChar = word[0];
+            const lastChar = word[word.length - 1];
+
+            card.innerHTML = `
+                <span class="word-text">${word}</span>
+                <div class="word-meta">
+                    <span class="meta-tag start">${startChar}</span>
+                    <span class="meta-tag">→</span>
+                    <span class="meta-tag end">${lastChar}</span>
+                </div>
+            `;
+            fragment.appendChild(card);
+        });
+
+        display.online.search.results.appendChild(fragment);
+        displayedCount += nextBatch.length;
     }
 });

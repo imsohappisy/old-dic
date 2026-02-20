@@ -33,6 +33,10 @@
                     <span class="icon">🌐</span>
                     <span class="text">온라인 대결 (β)</span>
                 </button>
+                <button id="btn-search" class="menu-btn search">
+                    <span class="icon">🔍</span>
+                    <span class="text">단어 검색</span>
+                </button>
                 <a href="#" class="menu-btn coffee" target="_blank" id="btn-coffee">
                     <span class="icon">☕</span>
                     <span class="text">개발자에게 커피 사주기</span>
@@ -135,6 +139,34 @@
             </div>
             <!-- Version Badge -->
             <div class="version-badge">v1.0.19</div>
+        </div>
+
+        <!-- Dictionary Search Screen -->
+        <div id="search-screen" class="screen hidden">
+            <header class="menu-header" style="height: auto; padding-bottom: 20px;">
+                <button id="btn-search-back" class="icon-btn" style="position: absolute; top: 20px; left: 20px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 style="font-size: 1.8rem; margin-top: 10px;">단어 검색(사전)</h1>
+                <p class="subtitle">게임에 등록된 단어를 검색해 보세요</p>
+            </header>
+
+            <div class="search-area">
+                <div class="search-input-wrapper">
+                    <input type="text" id="dictionary-input" placeholder="검색할 단어 입력..." autocomplete="off">
+                    <button id="btn-search-clear" class="clear-btn">&times;</button>
+                </div>
+                <div id="search-info" class="search-info">단어를 입력하면 실시간으로 검색됩니다.</div>
+            </div>
+
+            <div class="search-results-container">
+                <div id="search-results" class="search-results-list">
+                    <!-- Results will be lazily loaded here -->
+                </div>
+                <div id="search-loader" class="search-loader hidden">검색 중...</div>
+            </div>
         </div>
 
         <!-- Support Screen (Premium UI) -->
