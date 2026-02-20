@@ -673,7 +673,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Use setTimeout to avoid UI freeze during filter
         setTimeout(() => {
-            currentSearchResults = wordList.filter(word => word.includes(query));
+            currentSearchResults = wordList.filter(word =>
+                word.startsWith(query) || word.endsWith(query)
+            );
+
+            // Priority Sort: StartsWith first, then by length
+            currentSearchResults.sort((a, b) => {
+                const aStarts = a.startsWith(query);
+                const bStarts = b.startsWith(query);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return a.length - b.length;
+            });
+
             display.online.search.info.textContent = `검색 결과: ${currentSearchResults.length.toLocaleString()}개`;
             display.online.search.loader.classList.add('hidden');
             loadMoreResults();
