@@ -105,18 +105,18 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.search.addEventListener('click', showSearchScreen);
         buttons.searchBack.addEventListener('click', showMenu);
         buttons.searchClear.addEventListener('click', () => {
-            display.online.search.input.value = '';
+            display.search.input.value = '';
             performSearch();
         });
 
         let searchTimeout;
-        display.online.search.input.addEventListener('input', () => {
+        display.search.input.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(performSearch, 300);
         });
 
-        display.online.search.container.addEventListener('scroll', () => {
-            const { scrollTop, scrollHeight, clientHeight } = display.online.search.container;
+        display.search.container.addEventListener('scroll', () => {
+            const { scrollTop, scrollHeight, clientHeight } = display.search.container;
             if (scrollTop + clientHeight >= scrollHeight - 20) {
                 loadMoreResults();
             }
@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
         screens.game.classList.remove('active');
         screens.game.classList.add('hidden');
         screens.lobby.classList.remove('active');
-        screens.lobby.classList.add('hidden');
         screens.lobby.classList.add('hidden');
         screens.support.classList.remove('active');
         screens.support.classList.add('hidden');
@@ -176,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         screens.menu.classList.add('hidden');
         screens.search.classList.remove('hidden');
         screens.search.classList.add('active');
-        display.online.search.input.focus();
+        display.search.input.focus();
         performSearch(); // Initial state
     }
 
@@ -311,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processGiveUp(who) {
-        turn = 'finished';
         let winner = '';
 
         if (gameMode === 'online') {
@@ -321,9 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 winner = '나'; // Opponent gave up
             }
         } else {
-            if (turn === 'player1') winner = '플레이어 2';
+            // 'who' in local mode is 'me' (player1 gave up) or 'opponent' (player2 gave up)
+            if (who === 'me') winner = '플레이어 2';
             else winner = '플레이어 1';
         }
+
+        turn = 'finished';
 
         display.turnIndicator.textContent = `${winner} 승리! (${who === 'me' ? '기권함' : '상대방 기권'})`;
         display.turnIndicator.style.color = "var(--primary-color)";
@@ -659,17 +660,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const PAGE_SIZE = 50;
 
     function performSearch() {
-        const query = display.online.search.input.value.trim();
-        display.online.search.results.innerHTML = '';
+        const query = display.search.input.value.trim();
+        display.search.results.innerHTML = '';
         displayedCount = 0;
 
         if (query.length === 0) {
-            display.online.search.info.textContent = '단어를 입력하면 실시간으로 검색됩니다.';
+            display.search.info.textContent = '단어를 입력하면 실시간으로 검색됩니다.';
             currentSearchResults = [];
             return;
         }
 
-        display.online.search.loader.classList.remove('hidden');
+        display.search.loader.classList.remove('hidden');
 
         // Use setTimeout to avoid UI freeze during filter
         setTimeout(() => {
@@ -686,8 +687,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return a.length - b.length;
             });
 
-            display.online.search.info.textContent = `검색 결과: ${currentSearchResults.length.toLocaleString()}개`;
-            display.online.search.loader.classList.add('hidden');
+            display.search.info.textContent = `검색 결과: ${currentSearchResults.length.toLocaleString()}개`;
+            display.search.loader.classList.add('hidden');
             loadMoreResults();
         }, 10);
     }
@@ -716,7 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fragment.appendChild(card);
         });
 
-        display.online.search.results.appendChild(fragment);
+        display.search.results.appendChild(fragment);
         displayedCount += nextBatch.length;
     }
 });
